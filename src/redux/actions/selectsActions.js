@@ -11,10 +11,10 @@ export const fetchDirections = () => {
     }
   };
 };
-export const fetchSubResources = (tipo_id) => {
+export const fetchSubResources = (tipo_id, jerarquia) => {
   return async (dispatch) => {
     try {
-      const response = await getData(`selects/getRecursos/${tipo_id}`);
+      const response = await getData(`selects/getRecursos/${tipo_id}/${jerarquia}`);
       dispatch({ type: 'FETCH_RECURSOS_BY_TYPE_SUCCESS', payload: response.data });
       return response.data;
     } catch (error) {
@@ -23,6 +23,7 @@ export const fetchSubResources = (tipo_id) => {
     }
   };
 };
+
 export const fetchDataBases = (cadena) => {
   return async (dispatch) => {
     try {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-
+import Autocomplete from '@mui/material/Autocomplete';
 import { useDispatch } from 'react-redux'; // Importa el dispatch desde react-redux
 import {
   Box,
@@ -54,6 +54,7 @@ const Form = ({
 }) => {
   const [selectedSubResource, setSelectedSubResource] = useState('');
   const [resources, setResources] = useState([]);
+  const Jerarquia = localStorage.getItem('tipo');
   const [openEditModal, setOpenEditModal] = useState(false);
   const auth = useSelector((state) => state.auth.user.USUARIOID);
   const [data, setData] = useState(initialState);
@@ -73,7 +74,7 @@ const Form = ({
     setOpenEditModal(true);
   };
   const handleResourceChange = async (event) => {
-    const fetchedResources = await fetchSubResources(event.target.value);
+    const fetchedResources = await fetchSubResources(event.target.value,Jerarquia);
     setResources(fetchedResources);
     handleOpenModal();
     // Aquí actualizamos el valor del estado con el valor numérico seleccionado
@@ -138,39 +139,61 @@ const Form = ({
       setOpen(true);
       return;
     }
+    function getTipoFromSelectedSubResource(subResource) {
+      // Usamos una expresión regular para buscar "Tipo:1" o "Tipo:2" en el string
+      const match = subResource.match(/Tipo:(\d+)/);
+      if (match && match[1]) {
+          return parseInt(match[1], 10);
+      }
+      return null;
+  }
+  const tipoFromSubResource = getTipoFromSelectedSubResource(selectedSubResource);
+
+  const tipoIdValue = tipoFromSubResource === 1 ? 7 : (tipoFromSubResource === 2 ? 3 : 3); // Si no es ni 1 ni 2, por defecto será 3
+    
 
     const dataToSend = {
-      tipo_id: 3,
+      tipo_id: tipoIdValue,
       sol_usuarioidSolicitante: auth || null,
       recu_direccion: data.direction || null,
-      recu_gerencia: data.management || null,
-      recu_jefatura: data.leadership || null,
+     
+    recu_gerencia: data.management?.ger_nombre || null,  // Modificado aquí
+      recu_jefatura: data.leadership?.jef_nombre || null, 
       recu_solicitante: data.applicant || null,
       recu_justificacion: data.justification || null,
       recu_tipoRecursoInfo: data.type || null,
       recu_cantidad: data.quantity || null,
       recu_descripcion: data.description || null,
-      recu_recu:selectedSubResource
+      recu_recu:selectedSubResource,
+     
     };
 
+    let emailRecipient;
+
+    const tipo = getTipoFromSelectedSubResource(selectedSubResource);
+    
+    if (tipo === 1) {
+        emailRecipient = 'sebastiancorred@gmail.com';
+    } else if (tipo === 2) {
+        emailRecipient = 'residente10@pcolorada.com';
+    } else {
+        emailRecipient = 'juans.suarez@usantoto.edu.co'; // Esto se usará si no es ni tipo 1 ni tipo 2
+    }
+    
     try {
-      const res = await postAPI('make/accessResource', dataToSend);
-      dispatch({
-        // Usa el dispatch para enviar la acción
-        type: 'ALERT',
-        payload: { success: res.data.message },
-      });
+        const res = await postAPI('make/accessResource', dataToSend);
+        dispatch({
+            type: 'ALERT',
+            payload: { success: res.data.message },
+        });
     
-      
-      await handleSendEmails(
-        'residente10@pcolorada.com',
-        '',
-        'NUEVA SOLICITUD',
-        'Tienes una nueva solicitud  pendiente por aprobar, por favor dirigete al sistema Kiosco TI ingresando al siguiente link :',
-        'http://vwebgama:4002',
-      )
-      
-    
+        await handleSendEmails(
+            emailRecipient, // Usa la variable que acabas de determinar
+            '',
+            'NUEVA SOLICITUD',
+            'Tienes una nueva solicitud pendiente por aprobar, por favor dirigete al sistema Kiosco TI ingresando al siguiente link :',
+            'http://vwebgama:4002',
+        );
     } catch (error) {
       console.log(error);
     }
@@ -214,39 +237,41 @@ const Form = ({
               direction="row"
               sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
             >
-              <FormControl fullWidth sx={{ m: 1 }}>
-                <InputLabel id="select-label-management">Gerencia</InputLabel>
-                <Select
-                  labelId="select-label-management"
-                  id="management"
-                  label="Gerencia"
-                  value={data.management || ''}
-                  onChange={handleChangeInput('management')}
-                >
-                  {management.map((gerencia) => (
-                    <MenuItem key={gerencia.ger_id} value={gerencia.ger_nombre}>
-                      {gerencia.ger_nombre}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <FormHelperText>Seleccione la Gerencia de su area.</FormHelperText>
+                  <FormControl fullWidth sx={{ m: 1 }}>
+                <Autocomplete
+                  id="autocomplete-management"
+                  options={management}
+                  getOptionLabel={(option) => option.ger_nombre || ''}
+                  value={data.management}
+                  onChange={(event, newValue) => {
+                    setData((prevData) => ({
+                      ...prevData,
+                      management: newValue || null,
+                    }));
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Gerencia" placeholder="Escribe para buscar..." />
+                  )}
+                />
+                <FormHelperText>Seleccione la gerencia a la que será afiliado.</FormHelperText>
               </FormControl>
               <FormControl fullWidth sx={{ m: 1 }}>
-                <InputLabel id="select-label-leadership">Jefatura</InputLabel>
-                <Select
-                  labelId="select-label-leadership"
-                  id="leadership"
-                  label="Jefatura"
-                  value={data.leadership || ''}
-                  onChange={handleChangeInput('leadership')}
-                >
-                  {leadership.map((jefatura) => (
-                    <MenuItem key={jefatura.jef_id} value={jefatura.jef_nombre}>
-                      {jefatura.jef_nombre}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <FormHelperText>Seleccione su jefatura correspondiente.</FormHelperText>
+                <Autocomplete
+                  id="autocomplete-leadership"
+                  options={leadership}
+                  getOptionLabel={(option) => option.jef_nombre || ''}
+                  value={data.leadership}
+                  onChange={(event, newValue) => {
+                    setData((prevData) => ({
+                      ...prevData,
+                      leadership: newValue || null,
+                    }));
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Jefatura" placeholder="Escribe para buscar..." />
+                  )}
+                />
+                <FormHelperText>Seleccione la jefatura a la que será afiliado.</FormHelperText>
               </FormControl>
             </Stack>
             <Stack
@@ -389,7 +414,7 @@ const mapDispatchToProps = (dispatch) => ({
   fetchManagement: () => dispatch(fetchManagement()),
   fetchLeadership: () => dispatch(fetchLeadership()),
   fetchComputerResources: () => dispatch(fetchComputerResources()),
-  fetchSubResources: (tipo_id) => dispatch(fetchSubResources(tipo_id)),
+  fetchSubResources: (tipo_id, Jerarquia) => dispatch(fetchSubResources(tipo_id, Jerarquia)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Form);

@@ -23,8 +23,8 @@ const EditUbicacionModal = ({ open, onClose, ubicacion, onEdit }) => {
 
   const handleClose = () => {
     setEditedUbicacion({
-      nombre: ubicacion ? ubicacion.UbicacionNombre : '',
-      direccion: ubicacion ? ubicacion.ZonaNombre : ''
+      nombre: ubicacion ? ubicacion.UbicacionNombre : ''
+      
     });
     onClose();
   };
@@ -44,16 +44,7 @@ const EditUbicacionModal = ({ open, onClose, ubicacion, onEdit }) => {
           value={editedUbicacion.nombre}
           onChange={handleInputChange}
         />
-        <TextField
-          margin="dense"
-          label="Dirección"
-          type="text"
-          fullWidth
-          variant="outlined"
-          name="direccion"
-          value={editedUbicacion.direccion}
-          onChange={handleInputChange}
-        />
+        
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="primary">

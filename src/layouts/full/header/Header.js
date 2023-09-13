@@ -27,19 +27,14 @@ const Header = (props) => {
   return (
     <AppBarStyled position="sticky" color="default">
       <ToolbarStyled>
-        <IconButton
-          color="inherit"
-          aria-label="menu"
-          onClick={props.toggleMobileSidebar}
-          sx={{
-            display: {
-              lg: 'none',
-              xs: 'inline',
-            },
-          }}
-        >
-          <IconMenu width="20" height="20" />
-        </IconButton>
+      <IconButton
+  color="inherit"
+  aria-label="menu"
+  onClick={props.toggleSidebar} // Cambiamos el nombre de la función a "toggleSidebar"
+>
+  <IconMenu width="20" height="20" />
+</IconButton>
+
 
         <Box flexGrow={1} />
         <Stack spacing={1} direction="row" alignItems="center">

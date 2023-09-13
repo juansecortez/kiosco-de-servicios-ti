@@ -14,38 +14,72 @@ import {
 import {
   listarComentariosPorServicio,
   agregarComentario,
+  agregarImagen,
 } from 'src/redux/actions/solicitudActions';
+
+const API_BASE_URL = 'http://vwebgama:4001/api/v1';
 
 const ServiceModal = ({ openModal, setOpenModal, solicitud }) => {
   const dispatch = useDispatch();
   const comentarios = useSelector((state) => state.solicitudReducer.comentarios);
   const [newComment, setNewComment] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null); // Nuevo estado para la imagen seleccionada
+
+  const userData = JSON.parse(localStorage.getItem('user'));
+  const userRole = userData?.role || '';
+  const handleImageError = (e) => {
+    e.target.closest('a').style.display = 'none';
+  };
   useEffect(() => {
     if (solicitud) {
+      // Obtener los comentarios
       dispatch(listarComentariosPorServicio(`solicitud/comentarios/${solicitud.ID}`, solicitud.ID));
     }
-  }, [dispatch, listarComentariosPorServicio, solicitud]);
-
-  const handleAddComment = () => {
+  }, [dispatch, solicitud]);
+  const handleImageChange = (e) => {
+    setSelectedImage(e.target.files[0]);
+  };
+  const handleAddComment = async (event) => {
+    event.preventDefault();
     const user = localStorage.getItem('userId');
-    const url = 'solicitud/agregarComentario'; // Cambiar a la URL correspondiente
+    const url = 'solicitud/agregarComentario';
+
     const post = {
       ID_Servicio: solicitud.ID,
       ID_Usuario: user,
       Comentario: newComment,
     };
-  
-    dispatch(agregarComentario(url, post))
-      .then(() => {
-        // Refetch los comentarios luego de agregar uno nuevo.
-        dispatch(listarComentariosPorServicio(`solicitud/comentarios/${solicitud.ID}`, solicitud.ID));
-        setNewComment(''); // Limpiar el campo de texto
-      })
-      .catch((error) => {
-        // Aquí puedes manejar cualquier error que ocurra durante la solicitud, como mostrar un mensaje de error.
-        console.error(error);
-      });
+
+    try {
+      // Primero, agregamos el comentario.
+      const response = await dispatch(agregarComentario(url, post));
+      const idComentario = response.ID_Comentario;
+
+      console.log('ID del comentario agregado:', idComentario);
+
+      if (selectedImage) {
+        // Si se seleccionó una imagen, la agregamos.
+        const formData = new FormData();
+        formData.append('imagen', selectedImage);
+        formData.append('ID_Comentario', idComentario);
+
+        await dispatch(
+          agregarImagen('solicitud/subirImagen', selectedImage, null, idComentario, null),
+        );
+      }
+
+      // Luego, refrescamos los comentarios.
+      dispatch(listarComentariosPorServicio(`solicitud/comentarios/${solicitud.ID}`, solicitud.ID));
+
+      // Limpiamos el estado
+      setNewComment('');
+      setSelectedImage(null);
+    } catch (error) {
+      console.error(error);
+      // Puede que quieras manejar el error de alguna manera específica aquí, por ejemplo mostrando un mensaje al usuario.
+    }
   };
+
   return (
     <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="md" fullWidth>
       <DialogTitle>Detalles de la Solicitud</DialogTitle>
@@ -59,6 +93,27 @@ const ServiceModal = ({ openModal, setOpenModal, solicitud }) => {
           <Typography variant="h6">Ubicacion: {solicitud?.Ubicacion}</Typography>
           <Typography variant="h6">Jefatura: {solicitud?.Jefatura}</Typography>
           <Typography variant="h6">Estado: {solicitud?.Estado}</Typography>
+          <Typography variant="h5" color="primary">
+            Adjuntos
+          </Typography>
+          <a
+            href={`${API_BASE_URL}/solicitud/imagen/servicio/${solicitud?.ID}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={`${API_BASE_URL}/solicitud/imagen/servicio/${solicitud?.ID}`}
+              alt="Imagen adjunta"
+              style={{
+                maxWidth: '50%',
+                height: 'auto',
+                margin: '10px 0',
+                borderRadius: '4px', // redondear un poco las esquinas
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // sombra ligera para darle profundidad
+              }}
+              onError={handleImageError}
+            />
+          </a>
         </Box>
         <Divider variant="middle" />
         <Box mt={2}>
@@ -80,6 +135,18 @@ const ServiceModal = ({ openModal, setOpenModal, solicitud }) => {
                 <Typography variant="body1">
                   Fecha: {new Date(comment.Fecha).toLocaleString()}
                 </Typography>
+                <a
+                  href={`${API_BASE_URL}/solicitud/imagen/comentario/${comment.ID}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src={`${API_BASE_URL}/solicitud/imagen/comentario/${comment.ID}`}
+                    alt="No hay imagen adjunta"
+                    style={{ maxWidth: '40%', height: 'auto', margin: '10px 0' }}
+                    onError={handleImageError}
+                  />
+                </a>
               </Box>
             ))}
         </Box>
@@ -98,6 +165,11 @@ const ServiceModal = ({ openModal, setOpenModal, solicitud }) => {
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Escribe tu comentario aquí..."
           />
+
+          {/* Restringir el acceso al input de archivo solo para el administrador */}
+          {userRole === 'Administrador' && <input type="file" onChange={handleImageChange} />}
+
+          <Divider variant="middle" />
           <Button variant="contained" color="primary" onClick={handleAddComment}>
             Enviar
           </Button>

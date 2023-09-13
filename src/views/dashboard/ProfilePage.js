@@ -6,6 +6,7 @@ import PageContainer from 'src/components/container/PageContainer';
 import ProfileView from './components/ProfileView';
 import HistoryTI from './components/HistoryTI';
 import RequestsMade from './components/RequestsMade';
+import TodasLasSolicitudes from './components/TodasLasSolicitudes';
 
 
 const ProfilePage = () => {
@@ -21,6 +22,7 @@ const ProfilePage = () => {
       
         <Grid item xs={12}>
           <RequestsMade />
+          <TodasLasSolicitudes />
         </Grid>
       </Grid>
     </PageContainer>

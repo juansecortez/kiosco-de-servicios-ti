@@ -10,6 +10,19 @@ export const fetchZonas = () => async (dispatch) => {
   }
 };
 
+export const fetchUbicacionesByZona = (zonaNombre) => async (dispatch) => {
+  try {
+    const res = await getData(`Ubicacion/ubicacionesByZona/${zonaNombre}`);
+    dispatch({ type: 'FETCH_UBICACIONES_BY_ZONA_SUCCESS', payload: res.data });
+    return res.data;  // Devuelve las ubicaciones directamente
+  } catch (error) {
+    dispatch({ type: 'FETCH_UBICACIONES_BY_ZONA_FAILURE', payload: error.message });
+    throw error;  // Esto permite manejar el error si es necesario en el componente
+  }
+};
+
+
+
 export const addZona = (data) => async (dispatch) => {
   try {
     const res = await postaPI('Ubicacion/zonas', data);

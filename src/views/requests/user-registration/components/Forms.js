@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-
-import { useDispatch  } from 'react-redux'; // Importa el dispatch desde react-redux
+import Autocomplete from '@mui/material/Autocomplete';
+import { useDispatch } from 'react-redux'; // Importa el dispatch desde react-redux
 import {
   Button,
   FormControl,
@@ -17,7 +17,7 @@ import {
 import DashboardCard from 'src/components/shared/DashboardCard';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SendIcon from '@mui/icons-material/Send';
-import { postaPI, postAPI} from 'src/utils/FetchData';
+import { postaPI, postAPI } from 'src/utils/FetchData';
 import CustomDialog from 'src/components/shared/CustomDialog';
 import { connect } from 'react-redux';
 import {
@@ -50,7 +50,6 @@ const Forms = ({
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
 
-
   useEffect(() => {
     fetchDirections();
     fetchManagement();
@@ -69,16 +68,13 @@ const Forms = ({
   };
   const handleSendEmails = async (to, cc, title, txt, url) => {
     dispatch({ type: 'ALERT', payload: { loading: true } });
-    await postaPI(
-      "mail/sendemail",
-      {
-        to,
-        cc,
-        title,
-        txt,
-        url
-      }
-    )
+    await postaPI('mail/sendemail', {
+      to,
+      cc,
+      title,
+      txt,
+      url,
+    })
       .then((res) => {
         dispatch({ type: 'ALERT', payload: { loading: false } });
         dispatch({ type: 'ALERT', payload: { success: res.data.message } });
@@ -114,8 +110,8 @@ const Forms = ({
       sol_usuarioidSolicitante: user || null,
       altas_nombreColaborador: data.name || null,
       altas_direccion: data.direction || null,
-      altas_gerencia: data.management || null,
-      altas_jefatura: data.leadership || null,
+      altas_gerencia: data.management?.ger_nombre || null,  // Modificado aquí
+      altas_jefatura: data.leadership?.jef_nombre || null, 
       altas_fechaInicio: data.startDate || null,
       altas_fechaFin: data.endDate || null,
       altas_necesitaCorreo: data.needsEmail || null,
@@ -136,7 +132,8 @@ const Forms = ({
         'ddoval@pcolorada.com,jgquiteno@pcolorada.com',
         'NUEVA SOLICITUD',
         'Tienes una nueva solicitud  pendiente por aprobar, por favor dirigete al sistema Kiosco TI ingresando al siguiente link:',
-        'http://vwebgama:4002')
+        'http://vwebgama:4002',
+      );
     } catch (error) {
       console.log('Error en la solicitud:', error.message);
     }
@@ -188,37 +185,39 @@ const Forms = ({
               sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
             >
               <FormControl fullWidth sx={{ m: 1 }}>
-                <InputLabel id="select-label-management">Gerencia</InputLabel>
-                <Select
-                  labelId="select-label-management"
-                  id="management"
-                  label="Gerencia"
-                  value={data.management || ''}
-                  onChange={handleChangeInput('management')}
-                >
-                  {management.map((gerencia) => (
-                    <MenuItem key={gerencia.ger_id} value={gerencia.ger_nombre}>
-                      {gerencia.ger_nombre}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <Autocomplete
+                  id="autocomplete-management"
+                  options={management}
+                  getOptionLabel={(option) => option.ger_nombre || ''}
+                  value={data.management}
+                  onChange={(event, newValue) => {
+                    setData((prevData) => ({
+                      ...prevData,
+                      management: newValue || null,
+                    }));
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Gerencia" placeholder="Escribe para buscar..." />
+                  )}
+                />
                 <FormHelperText>Seleccione la gerencia a la que será afiliado.</FormHelperText>
               </FormControl>
               <FormControl fullWidth sx={{ m: 1 }}>
-                <InputLabel id="select-label-leadership">Jefatura</InputLabel>
-                <Select
-                  labelId="select-label-leadership"
-                  id="leadership"
-                  label="Jefatura"
-                  value={data.leadership || ''}
-                  onChange={handleChangeInput('leadership')}
-                >
-                  {leadership.map((jefatura) => (
-                    <MenuItem key={jefatura.jef_id} value={jefatura.jef_nombre}>
-                      {jefatura.jef_nombre}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <Autocomplete
+                  id="autocomplete-leadership"
+                  options={leadership}
+                  getOptionLabel={(option) => option.jef_nombre || ''}
+                  value={data.leadership}
+                  onChange={(event, newValue) => {
+                    setData((prevData) => ({
+                      ...prevData,
+                      leadership: newValue || null,
+                    }));
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Jefatura" placeholder="Escribe para buscar..." />
+                  )}
+                />
                 <FormHelperText>Seleccione la jefatura a la que será afiliado.</FormHelperText>
               </FormControl>
             </Stack>

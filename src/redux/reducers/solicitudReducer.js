@@ -29,6 +29,33 @@ function solicitudReducer(state = initialState, action) {
         solicitudes: [...state.solicitudes, action.payload],
         loading: false,
       };
+      case 'AGREGAR_IMAGEN_SUCCESS':
+  return {
+    ...state,
+    imagenes: [...state.imagenes, action.payload], // Asume que hay un array de imágenes en el estado inicial
+    loading: false,
+  };
+
+case 'AGREGAR_IMAGEN_FAILURE':
+  return {
+    ...state,
+    loading: false,
+    error: action.payload,
+  };
+
+case 'OBTENER_IMAGEN_SUCCESS':
+  return {
+    ...state,
+    imagen: action.payload, // Asume que hay un objeto de imagen en el estado inicial
+    loading: false,
+  };
+
+case 'OBTENER_IMAGEN_FAILURE':
+  return {
+    ...state,
+    loading: false,
+    error: action.payload,
+  };
 
     case 'LISTAR_SOLICITUDES_SUCCESS':
       return {
@@ -45,7 +72,18 @@ function solicitudReducer(state = initialState, action) {
         error: action.payload,
       };
 
-
+      case 'LISTAR_SOLICITUDES_ID_SUCCESS':
+        return {
+            ...state,
+            solicitudes: action.payload,
+        };
+    
+    case 'LISTAR_SOLICITUDES_ID_FAILURE':
+        return {
+            ...state,
+            loading: false,
+            error: action.payload,
+        };
     case 'AGREGAR_COMENTARIO_SUCCESS':
       return {
         ...state,

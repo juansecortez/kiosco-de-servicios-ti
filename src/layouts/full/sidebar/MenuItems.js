@@ -1,3 +1,4 @@
+
 import {
   IconUser,
   IconUserPlus,
@@ -6,10 +7,18 @@ import {
   IconFolderPlus,
   IconDatabaseImport,
   IconWifi,
-  IconListCheck,
-  IconTool
-} from '@tabler/icons';
 
+  IconTool,
+  IconTicket, // Icono de hoja
+  IconMap2, // Icono de ubicación
+  IconServer, // Icono de recurso
+  
+  IconPrinter,
+  IconUserExclamation,
+ 
+} from '@tabler/icons';
+import { IconUsersGroup,IconSubtask} from '@tabler/icons-react';
+import {IconChartInfographic,IconChecklist} from '@tabler/icons-react';
 import { uniqueId } from 'lodash';
 
 const Menuitems = [
@@ -31,15 +40,35 @@ const Menuitems = [
   {
     id: uniqueId(),
     title: 'Por aprobar',
-    icon: IconListCheck, // Aquí puedes cambiar el ícono si deseas.
+    icon: IconChecklist,
     href: '/beapproved',
     adminOnly: true,
   },
   {
     id: uniqueId(),
     title: 'Por finalizar',
-    icon: IconTool,
+    icon: IconSubtask, // Icono de check
     href: '/pendientes',
+    adminOnly: true,
+  },
+  {
+    navlabel: true,
+    subheader: 'Analitica',
+    adminOnly: true,
+  },
+  
+  {
+    id: uniqueId(),
+    title: 'Tiempo en linea',
+    icon: IconChartInfographic, // Icono de recurso
+    href: '/devices',
+    adminOnly: true,
+  },
+  {
+    id: uniqueId(),
+    title: 'Dashboard Servicio Técnico ',
+    icon: IconChartInfographic, // Icono de recurso
+    href: '/dbdst',
     adminOnly: true,
   },
   {
@@ -50,18 +79,33 @@ const Menuitems = [
   
   {
     id: uniqueId(),
-    title: ' Catalogo de recursos',
-    icon: IconTool,
+    title: 'Control de recursos',
+    icon: IconServer, // Icono de recurso
     href: '/recursos',
     adminOnly: true,
   },
   {
     id: uniqueId(),
-    title: ' Catalogo de ubicaciones',
-    icon: IconTool,
+    title: 'Control de externos',
+    icon: IconUsersGroup, // Icono de recurso
+    href: '/externos',
+    adminOnly: true,
+  },
+  {
+    id: uniqueId(),
+    title: 'Control de ubicaciones',
+    icon: IconMap2,
     href: '/ubicacion',
     adminOnly: true,
   },
+  {
+    id: uniqueId(),
+    title: 'Control de issues',
+    icon: IconUserExclamation, // Usando el ícono de exclamación para representar problemas o incidencias
+    href: '/issues',
+    adminOnly: true,
+  },
+  
   {
     navlabel: true,
     subheader: 'Manejo de Servicio Técnico',
@@ -71,7 +115,7 @@ const Menuitems = [
   {
     id: uniqueId(),
     title: 'Tickets',
-    icon: IconTool,
+    icon: IconTicket, // Un ticket o comprobante
     href: '/solicitud',
     adminOnly: true,
   },
@@ -84,6 +128,12 @@ const Menuitems = [
     title: 'Servicio técnico',
     icon: IconTool,
     href: '/requests/servicio',
+  },
+  {
+    id: uniqueId(),
+    title: 'Impresoras *',
+    icon: IconPrinter, // Una impresora
+    href: '/impresoras',
   },
   {
     navlabel: true,
@@ -125,7 +175,6 @@ const Menuitems = [
     icon: IconWifi,
     href: '/requests/internet',
   },
-  
 ];
 
 export default Menuitems;

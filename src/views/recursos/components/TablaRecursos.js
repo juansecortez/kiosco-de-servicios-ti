@@ -111,6 +111,12 @@ const ResourceTable = ({ recursos, fetchRecursos, deleteRecurso, editRecurso }) 
                                 <Typography variant="h6" fontWeight="bold">Descripcion</Typography>
                             </TableCell>
                             <TableCell>
+                                <Typography variant="h6" fontWeight="bold">Nivel</Typography>
+                            </TableCell>
+                            <TableCell>
+                                <Typography variant="h6" fontWeight="bold">Jerarquia</Typography>
+                            </TableCell>
+                            <TableCell>
                                 <Typography variant="h6" fontWeight="bold">Precio</Typography>
                             </TableCell>
                             <TableCell>
@@ -127,6 +133,8 @@ const ResourceTable = ({ recursos, fetchRecursos, deleteRecurso, editRecurso }) 
                             <TableRow key={recurso.Id ? recurso.Id : index}>
                                 <TableCell>{recurso.Nombre}</TableCell>
                                 <TableCell>{recurso.Descripcion}</TableCell>
+                                <TableCell>{recurso.Nivel}</TableCell>
+                                <TableCell>{recurso.Jerarquia}</TableCell>
                                 <TableCell>{recurso.Precio}</TableCell>
                                 <TableCell>{recurso.TipoRecurso}</TableCell>
                                 <TableCell>

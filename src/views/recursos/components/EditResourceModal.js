@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button,InputLabel,FormControl,Select ,MenuItem} from '@mui/material';
 
 const EditResourceModal = ({ open, onClose, recurso, onEdit }) => {
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
+  const [nivel, setNivel] = useState("");
+  const [jerarquia, setJerarquia] = useState("");
   const [precio, setPrecio] = useState("");
   const [tipo, setTipo] = useState("");
 
@@ -11,6 +13,8 @@ const EditResourceModal = ({ open, onClose, recurso, onEdit }) => {
     if (recurso) {
       setNombre(recurso.Nombre);
       setDescripcion(recurso.Descripcion);
+      setNivel(recurso.Nivel);
+      setJerarquia(recurso.Jerarquia);
       setPrecio(recurso.Precio);
       setTipo(recurso.TipoRecurso);
     }
@@ -20,6 +24,8 @@ const EditResourceModal = ({ open, onClose, recurso, onEdit }) => {
     onEdit(recurso.Id, {
       nombre: nombre,
       descripcion: descripcion,
+      nivel: nivel,
+      jerarquia: jerarquia,
       precio: precio,
     });
     onClose();
@@ -48,6 +54,30 @@ const EditResourceModal = ({ open, onClose, recurso, onEdit }) => {
           value={descripcion}
           onChange={e => setDescripcion(e.target.value)}
         />
+        <FormControl fullWidth margin="normal">
+                    <InputLabel>Nivel</InputLabel>
+                    <Select
+                        value={nivel}
+                        onChange={e => setNivel(e.target.value)}
+                    >
+                        <MenuItem value={'1'}>1</MenuItem>
+                        <MenuItem value={'2'}>2</MenuItem>
+                    
+                    </Select>
+                </FormControl>
+                <FormControl fullWidth margin="normal">
+                    <InputLabel>Jerarquia</InputLabel>
+                    <Select
+                        value={jerarquia}
+                        onChange={e => setJerarquia(e.target.value)}
+                    >
+                        <MenuItem value={'1'}>1</MenuItem>
+                        <MenuItem value={'2'}>2</MenuItem>
+                        <MenuItem value={'3'}>3</MenuItem>
+                        <MenuItem value={'4'}>4</MenuItem>
+                    
+                    </Select>
+                </FormControl>
         <TextField
           margin="dense"
           id="precio"

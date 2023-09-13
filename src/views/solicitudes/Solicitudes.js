@@ -29,22 +29,44 @@ const Solicitudes = ({
   cambiarEstadoServicio,
 }) => {
   const [openModal, setOpenModal] = useState(false);
-  const [selectedService, setSelectedService] = useState(null);
+  const [selectedService, setSelectedService] = useState({});
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterEstado, setFilterEstado] = useState('');
+  const ID_Usuario = localStorage.getItem('userId');
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(20);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   useEffect(() => {
     listarSolicitudes('solicitud/listarSolicitudes').catch((error) =>
       console.error('Failed to fetch solicitudes:', error),
     );
   }, [listarSolicitudes]);
 
-  const handleChangeEstado = (ID, Estado) => {
-    cambiarEstadoServicio('solicitud/cambiarEstadoServicio', { ID, Estado })
-      .then(() => listarSolicitudes('solicitud/listarSolicitudes'))
+  const handleChangeEstado = (solicitud, Estado) => {
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getFullYear()}-${currentDate.getMonth()+1}-${currentDate.getDate()} ${currentDate.getHours()}:${currentDate.getMinutes()}:${currentDate.getSeconds()}`;
+    
+    let data = {
+        ID: solicitud.ID,
+        Estado: Estado,
+        ID_Tecnico: ID_Usuario  // Debes obtener el ID técnico de algún lado
+    };
+
+    if(Estado === "En Progreso") {
+        data.FechaModificacion = formattedDate;
+    } else if(Estado === "Completado") {
+        data.FechaFinalizacion = formattedDate;
+    }
+
+    cambiarEstadoServicio('solicitud/cambiarEstadoServicio', data)
+      .then(() => {
+          listarSolicitudes('solicitud/listarSolicitudes');
+          handleOpenModal(solicitud); // Abre el modal después de cambiar el estado.
+      })
       .catch((error) => console.error('Failed to change estado:', error));
-  };
+};
+
+
   const statusColors = {
     Pendiente: 'red',
     'En Progreso': 'orange',
@@ -169,7 +191,7 @@ const Solicitudes = ({
                     <FormControl>
                       <Select
                         value={solicitud.Estado}
-                        onChange={(e) => handleChangeEstado(solicitud.ID, e.target.value)}
+                        onChange={(e) => handleChangeEstado(solicitud, e.target.value)}
                       >
                         <MenuItem value="Pendiente">Pendiente</MenuItem>
                         <MenuItem value="En Progreso">En Progreso</MenuItem>

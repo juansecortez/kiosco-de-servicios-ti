@@ -125,7 +125,7 @@ const UbicacionesTable = ({ ubicaciones, fetchUbicaciones, deleteUbicacion, edit
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((ubicacion, index) => (
                 <TableRow key={ubicacion.ID ? ubicacion.ID : index}>
-                  <TableCell>{ubicacion.UbicacionNombre}</TableCell>{' '}
+                  <TableCell>{ubicacion.UbicacionNombre}</TableCell>
                   {/* Cambiado de Nombre a UbicacionNombre */}
                   <TableCell>{ubicacion.ZonaNombre}</TableCell>
                   <TableCell>

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-
+import Autocomplete from '@mui/material/Autocomplete';
 import { useDispatch} from 'react-redux'; // Importa el dispatch desde react-redux
 import {
   Box,
@@ -102,8 +102,9 @@ const Test = ({
       tipo_id: 2,
       sol_usuarioidSolicitante: user || null,
       sis_direccion: data.direction || null,
-      sis_gerencia: data.management || null,
-      sis_jefatura: data.leadership || null,
+
+      sis_gerencia: data.management?.ger_nombre || null,  // Modificado aquí
+      sis_jefatura: data.leadership?.jef_nombre || null, 
       sis_nombreSistema: data.name || null,
       sis_funcionDesarrollar: data.service || null,
     };
@@ -166,39 +167,41 @@ const Test = ({
               direction="row"
               sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
             >
-              <FormControl fullWidth sx={{ m: 1 }}>
-                <InputLabel id="select-label-management">Gerencia</InputLabel>
-                <Select
-                  labelId="select-label-management"
-                  id="management"
-                  label="Gerencia"
-                  value={data.management || ''}
-                  onChange={handleChangeInput('management')}
-                >
-                  {management.map((gerencia) => (
-                    <MenuItem key={gerencia.ger_id} value={gerencia.ger_nombre}>
-                      {gerencia.ger_nombre}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <FormHelperText>Seleccione la Gerencia de su area.</FormHelperText>
+                <FormControl fullWidth sx={{ m: 1 }}>
+                <Autocomplete
+                  id="autocomplete-management"
+                  options={management}
+                  getOptionLabel={(option) => option.ger_nombre || ''}
+                  value={data.management}
+                  onChange={(event, newValue) => {
+                    setData((prevData) => ({
+                      ...prevData,
+                      management: newValue || null,
+                    }));
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Gerencia" placeholder="Escribe para buscar..." />
+                  )}
+                />
+                <FormHelperText>Seleccione la gerencia a la que será afiliado.</FormHelperText>
               </FormControl>
               <FormControl fullWidth sx={{ m: 1 }}>
-                <InputLabel id="select-label-leadership">Jefatura</InputLabel>
-                <Select
-                  labelId="select-label-leadership"
-                  id="leadership"
-                  label="Jefatura"
-                  value={data.leadership || ''}
-                  onChange={handleChangeInput('leadership')}
-                >
-                  {leadership.map((jefatura) => (
-                    <MenuItem key={jefatura.jef_id} value={jefatura.jef_nombre}>
-                      {jefatura.jef_nombre}
-                    </MenuItem>
-                  ))}
-                </Select>
-                <FormHelperText>Seleccione su jefatura correspondiente.</FormHelperText>
+                <Autocomplete
+                  id="autocomplete-leadership"
+                  options={leadership}
+                  getOptionLabel={(option) => option.jef_nombre || ''}
+                  value={data.leadership}
+                  onChange={(event, newValue) => {
+                    setData((prevData) => ({
+                      ...prevData,
+                      leadership: newValue || null,
+                    }));
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Jefatura" placeholder="Escribe para buscar..." />
+                  )}
+                />
+                <FormHelperText>Seleccione la jefatura a la que será afiliado.</FormHelperText>
               </FormControl>
             </Stack>
             <Stack

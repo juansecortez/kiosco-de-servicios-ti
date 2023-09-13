@@ -4,14 +4,17 @@ import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 const CreateResourceModal = ({ open, onClose, onCreate }) => {
     const [nombre, setNombre] = useState("");
     const [descripcion, setDescripcion] = useState("");
+    const [nivel, setNivel] = useState("");
     const [precio, setPrecio] = useState("");
     const [tipo, setTipo] = useState("");
     const [tipoText, setTipoText] = useState("");
-
+    const [jerarquia, setJerarquia] = useState("");
     const handleSave = () => {
         onCreate({
             nombre: nombre,
             descripcion: descripcion,
+            nivel: nivel,
+            jerarquia: jerarquia,
             precio: precio,
             tipo_id: tipo
         });
@@ -19,7 +22,9 @@ const CreateResourceModal = ({ open, onClose, onCreate }) => {
         // Limpiar los campos del formulario
         setNombre("");
         setDescripcion("");
-        setPrecio("");
+        setNivel("");
+        setNivel("");
+        setJerarquia("");
         setTipo("");
         setTipoText("");
     };
@@ -63,6 +68,30 @@ const CreateResourceModal = ({ open, onClose, onCreate }) => {
                     value={descripcion}
                     onChange={e => setDescripcion(e.target.value)}
                 />
+                 <FormControl fullWidth margin="normal">
+                    <InputLabel>Nivel</InputLabel>
+                    <Select
+                        value={nivel}
+                        onChange={e => setNivel(e.target.value)}
+                    >
+                        <MenuItem value={'1'}>1</MenuItem>
+                        <MenuItem value={'2'}>2</MenuItem>
+                    
+                    </Select>
+                </FormControl>
+                <FormControl fullWidth margin="normal">
+                    <InputLabel>Jerarquia</InputLabel>
+                    <Select
+                        value={jerarquia}
+                        onChange={e => setJerarquia(e.target.value)}
+                    >
+                        <MenuItem value={'1'}>1</MenuItem>
+                        <MenuItem value={'2'}>2</MenuItem>
+                        <MenuItem value={'3'}>3</MenuItem>
+                        <MenuItem value={'4'}>4</MenuItem>
+                    
+                    </Select>
+                </FormControl>
                 <TextField
                     margin="dense"
                     id="precio"

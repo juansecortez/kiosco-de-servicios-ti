@@ -20,6 +20,36 @@ export const getAPI = async (url, token) => {
   return res;
 };
 
+export const uploadFileAPI = async (url, file, ID_Servicio, ID_Comentario, ID_Externo) => {
+  const formData = new FormData();
+  formData.append("imagen", file);
+
+  // Sólo agrega ID_Servicio si no es nulo
+  if (ID_Servicio == null && ID_Externo == null) {
+    formData.append('ID_Comentario', ID_Comentario);
+    
+  }
+
+
+  else if (ID_Comentario == null && ID_Externo == null) {
+    
+    formData.append("ID_Servicio", ID_Servicio);
+  }
+  else if (ID_Comentario == null && ID_Servicio == null) {
+    formData.append('ID_Externo', ID_Externo);
+  }
+  try {
+    const response = await axios.post(`http://vwebgama:4001/api/v1/${url}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 
 export const getData = async (url) => {
   const res = await axios.get(`http://vwebgama:4001/api/v1/${url}`);

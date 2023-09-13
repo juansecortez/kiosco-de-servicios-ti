@@ -9,6 +9,9 @@ import requestsType from './requestsTypeReducer';
 import recursoReducer from './recursoReducer'
 import solicitudReducer from './solicitudReducer';
 import zonasUbicacionReducer from './zonasUbicacionReducer';
+import issueReducer from './issueReducer';
+import externosReducer from './externosReducer';
+import deviceReducer from './deviceReducers';
 
 export default combineReducers({
   auth,
@@ -20,5 +23,8 @@ export default combineReducers({
   requestsType,
   recursoReducer,
   solicitudReducer,
-  zonasUbicacionReducer
+  zonasUbicacionReducer,
+  issueReducer,
+  externosReducer,
+  deviceReducer
 });
