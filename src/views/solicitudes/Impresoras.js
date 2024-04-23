@@ -8,7 +8,7 @@ import {
   ListItem,
   Typography,
   Paper,
-} from '@material-ui/core';
+} from '@mui/material';
 import PageContainer from 'src/components/container/PageContainer';
 import DashboardCard from 'src/components/shared/DashboardCard';
 

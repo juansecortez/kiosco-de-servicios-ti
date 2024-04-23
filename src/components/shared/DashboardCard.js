@@ -16,7 +16,7 @@ const DashboardCard = ({
     <Card 
       sx={{ 
         padding: 0,
-        borderTop: (theme) => `8px solid ${theme.palette.primary.main}` 
+        borderTop: (theme) => `8px solid ${theme.palette.success.main}` 
       }} 
       elevation={9} 
       variant={undefined}

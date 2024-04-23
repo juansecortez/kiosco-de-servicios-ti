@@ -45,6 +45,7 @@ const Test = ({
   fetchInformationSystems,
 }) => {
   const user = localStorage.getItem('userId');
+  const nombre = localStorage.getItem('nombre');
   const [data, setData] = React.useState(initialState);
   const [open, setOpen] = React.useState(false);
   const dispatch = useDispatch();
@@ -65,16 +66,19 @@ const Test = ({
     setData(initialState);
   };
 
-  const handleSendEmails = async (to, cc, title, txt, url) => {
+  const handleSendEmails = async (to, cc, title, txt, urlAceptacion, urlRechazo, solicitante, solicitud) => {
     dispatch({ type: 'ALERT', payload: { loading: true } });
     await postaPI(
-      "mail/sendemail",
+      "mail/sendemail1",
       {
         to,
         cc,
         title,
         txt,
-        url
+        urlAceptacion,
+        urlRechazo,
+        solicitante,
+        solicitud
       }
     )
       .then((res) => {
@@ -118,12 +122,37 @@ const Test = ({
           payload: { success: res.data.message },
         });
       }
+      const responseData = res.data.data;
       await handleSendEmails(
         'galvarez@pcolorada.com',
-        'ddoval@pcolorada.com,jvillalobos@pcolorada.com,gquiteno@pcolorada.com',
-        'NUEVA SOLICITUD',
-        'Tienes una nueva solicitud  pendiente por aprobar, por favor dirigete al sistema Kiosco TI ingresando al siguiente link:',
-        'http://vwebgama:4002')
+        '',
+        `NUEVA SOLICITUD DE`,
+        'Se solicita la autorización para el acceso al sistema de informacion con nombre:',
+        `https://autorizaitk.pcolorada.com/api/v1/request/authorize/${responseData}/galvarez`, // URL de Aceptación
+        `https://autorizaitk.pcolorada.com/api/v1/request/reject/${responseData}/galvarez`, // URL de Rechazo
+        `${nombre}`, // Puedes reemplazar esto con la variable que tenga el nombre del solicitante
+        `${data.name}`, // Un ejemplo simple que utiliza responseData. Modifica según tus necesidades
+      );
+      await handleSendEmails(
+        'ddoval@pcolorada.com',
+        '',
+        `NUEVA SOLICITUD DE`,
+        'Se solicita la autorización para el acceso al sistema de informacion con nombre:',
+        `https://autorizaitk.pcolorada.com/api/v1/request/authorize/${responseData}/ddoval`, // URL de Aceptación
+        `https://autorizaitk.pcolorada.com/api/v1/request/reject/${responseData}/ddoval`, // URL de Rechazo
+        `${nombre}`, // Puedes reemplazar esto con la variable que tenga el nombre del solicitante
+        `${data.name}`, // Un ejemplo simple que utiliza responseData. Modifica según tus necesidades
+      );
+      await handleSendEmails(
+        'jvillalobos@pcolorada.com',
+        '',
+        `NUEVA SOLICITUD DE`,
+        'Se solicita la autorización para el acceso al sistema de informacion con nombre:',
+        `https://autorizaitk.pcolorada.com/api/v1/request/authorize/${responseData}/jvillalobos`, // URL de Aceptación
+        `https://autorizaitk.pcolorada.com/api/v1/request/reject/${responseData}/jvillalobos`, // URL de Rechazo
+        `${nombre}`, // Puedes reemplazar esto con la variable que tenga el nombre del solicitante
+        `${data.name}`, // Un ejemplo simple que utiliza responseData. Modifica según tus necesidades
+      );
     } catch {
       console.log('Error al crear la solicitud');
     }

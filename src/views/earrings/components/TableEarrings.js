@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { connect,useSelector } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import {
   Chip,
   Fab,
@@ -17,15 +17,13 @@ import {
   DialogActions,
   Typography,
 } from '@mui/material';
-import {
-  markAsDone
-} from '../../../redux/actions/requestsActions';
+import { markAsDone } from '../../../redux/actions/requestsActions';
 import { fetchReqForEarrings } from 'src/redux/actions/selectsActions';
 import { IconEye, IconCheck } from '@tabler/icons';
 import ModalIS from 'src/views/dashboard/components/ModalIS';
 import Loadable from 'src/layouts/full/shared/loadable/Loadable';
 
-const TableEarrings = ({ earrings, loading, error, fetchReqForEarrings,markAsDone }) => {
+const TableEarrings = ({ earrings, loading, error, fetchReqForEarrings, markAsDone }) => {
   const auth = useSelector((state) => state.auth.user.USUARIOID);
   const [openModal, setOpenModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -33,15 +31,11 @@ const TableEarrings = ({ earrings, loading, error, fetchReqForEarrings,markAsDon
   const [confirmAction, setConfirmAction] = useState('');
   const [confirmMessage, setConfirmMessage] = useState('');
 
-  
   const openConfirmationModal = (id, action) => {
-    
     setSelectedSolicitud(id);
     setConfirmAction(action);
     setOpenModal(true);
-    setConfirmMessage(
-      '¿seguro quieres confirmar esta tarea?'
-    );
+    setConfirmMessage('¿seguro quieres confirmar esta tarea?');
   };
   const openModals = (solicitud) => {
     setSelectedSolicitud(solicitud);
@@ -55,8 +49,6 @@ const TableEarrings = ({ earrings, loading, error, fetchReqForEarrings,markAsDon
     setConfirmAction('');
     setOpenModal(false);
   };
-
-  
 
   const handleDo = () => {
     if (selectedSolicitud) {
@@ -97,7 +89,7 @@ const TableEarrings = ({ earrings, loading, error, fetchReqForEarrings,markAsDon
 
   if (!earrings || earrings.length === 0) {
     return (
-      <Typography variant="subtitle1" fontWeight={600} align='center'>
+      <Typography variant="subtitle1" fontWeight={600} align="center">
         No tienes pendientes por finalizar.
       </Typography>
     );
@@ -149,7 +141,9 @@ const TableEarrings = ({ earrings, loading, error, fetchReqForEarrings,markAsDon
                           ? 'blue'
                           : solicitud.sol_estatusSolicitud === 1
                           ? 'green'
-                          : 'red',
+                          : solicitud.sol_estatusSolicitud === 2
+                          ? 'red'
+                          : 'gray', // Color por defecto para otros estados desconocidos
                       color: '#fff',
                     }}
                     size="small"
@@ -158,7 +152,9 @@ const TableEarrings = ({ earrings, loading, error, fetchReqForEarrings,markAsDon
                         ? 'En proceso'
                         : solicitud.sol_estatusSolicitud === 1
                         ? 'Aceptado'
-                        : 'Rechazado'
+                        : solicitud.sol_estatusSolicitud === 2
+                        ? 'Rechazado'
+                        : 'Desconocido' // Etiqueta por defecto para otros estados desconocidos
                     }
                   ></Chip>
                 </TableCell>
@@ -183,8 +179,6 @@ const TableEarrings = ({ earrings, loading, error, fetchReqForEarrings,markAsDon
                       <IconCheck />
                     </Fab>
                   </Tooltip>
-
-                 
                 </TableCell>
               </TableRow>
             ))}

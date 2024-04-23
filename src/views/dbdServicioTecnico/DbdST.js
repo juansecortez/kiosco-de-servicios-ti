@@ -5,8 +5,8 @@ import DashboardCard from 'src/components/shared/DashboardCard';
 import { fetchMetricsByState } from '../../redux/actions/deviceActions';
 
 // Importaciones de Material-UI
-import { Typography, Card, CardContent, makeStyles } from '@material-ui/core';
-
+import { Typography, Card, CardContent} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 // Importaciones de @tabler/icons-react
 import { IconCircleCheckFilled, IconCircleCaretRight, IconCircleXFilled, IconInnerShadowLeftFilled } from '@tabler/icons-react';
 

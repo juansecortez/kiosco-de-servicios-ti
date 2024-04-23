@@ -8,6 +8,7 @@ export const loginUser = (userLogin) => async (dispatch) => {
     dispatch({ type: 'ALERT', payload: { loading: false } });
     localStorage.setItem('logged', 'true');
     localStorage.setItem('userId', res.data.user.USUARIOID);
+    localStorage.setItem('nombre', res.data.user.NOMBRE);
     localStorage.setItem('tipo', res.data.user.NIVELFIRMA);
     localStorage.setItem('user', JSON.stringify(res.data.user));
   } catch (error) {
@@ -23,6 +24,7 @@ export const logout = () => async (dispatch) => {
   try {
     localStorage.removeItem('logged');
     localStorage.removeItem('userId');
+    localStorage.removeItem('nombre');
     localStorage.removeItem('user');
     await getAPI('auth/logout');
     window.location.href = '/auth/login';
@@ -47,6 +49,7 @@ export const refreshToken = () => async (dispatch) => {
     dispatch({ type: 'ALERT', payload: { loading: false } });
     localStorage.removeItem('logged');
     localStorage.removeItem('userId');
+    localStorage.removeItem('nombre');
     localStorage.removeItem('user');
     window.location.href = '/auth/login';
     dispatch({

@@ -17,7 +17,7 @@ import {
   Typography,
   MenuItem 
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { styled } from '@mui/system';
 
 import { Search as SearchIcon, Clear as ClearIcon } from '@mui/icons-material';
 import { fetchExternos, deleteExterno, editExterno } from 'src/redux/actions/externosActions';

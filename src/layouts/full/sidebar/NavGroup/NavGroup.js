@@ -6,12 +6,12 @@ const NavGroup = ({ item }) => {
   const ListSubheaderStyle = styled((props) => <ListSubheader disableSticky {...props} />)(
     ({ theme }) => ({
       ...theme.typography.overline,
-      fontWeight: '700',
+      fontWeight: '800',
       marginTop: theme.spacing(3),
       marginBottom: theme.spacing(0),
       color: theme.palette.text.sidebar,
-      lineHeight: '26px',
-      padding: '3px 12px',
+      lineHeight: '30px',
+      padding: '4px 14px',
     }),
   );
   return <ListSubheaderStyle>{item.subheader}</ListSubheaderStyle>;

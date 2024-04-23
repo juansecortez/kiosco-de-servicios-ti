@@ -11,7 +11,9 @@ import {
 } from '../../redux/actions/deviceActions';
 
 // Importaciones de Material-UI
-import { Select, MenuItem, FormControl, InputLabel, makeStyles,Typography } from '@material-ui/core';
+import { Select, MenuItem, FormControl, InputLabel, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
+
 import BarChartComponent from './components/BarChartComponent'; // Asegúrate de poner la ruta correcta
 import GroupedBarChartComponent from './components/GroupedBarChartComponent';
 import GroupedBarChartTypeComponent from './components/GroupedBarChartTypeComponent';

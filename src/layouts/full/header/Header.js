@@ -1,52 +1,42 @@
 import React from 'react';
-import { Box, AppBar, Toolbar, styled, Stack, IconButton } from '@mui/material';
-import PropTypes from 'prop-types';
-
-// components
-import Profile from './Profile';
+import { AppBar, Toolbar, IconButton,} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { IconMenu } from '@tabler/icons';
+import Logo from './Brand';
+import Profile from './Profile';
+
+const useStyles = makeStyles((theme) => ({
+  toolbar: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  logoContainer: {
+    flex: 1,
+    display: 'flex',
+    justifyContent: 'center',
+  },
+}));
 
 const Header = (props) => {
-  // const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
-  // const lgDown = useMediaQuery((theme) => theme.breakpoints.down('lg'));
-
-  const AppBarStyled = styled(AppBar)(({ theme }) => ({
-    boxShadow: 'none',
-    background: theme.palette.background.paper,
-    justifyContent: 'center',
-    backdropFilter: 'blur(4px)',
-    [theme.breakpoints.up('lg')]: {
-      minHeight: '70px',
-    },
-  }));
-  const ToolbarStyled = styled(Toolbar)(({ theme }) => ({
-    width: '100%',
-    color: theme.palette.text.secondary,
-  }));
+  const classes = useStyles();
 
   return (
-    <AppBarStyled position="sticky" color="default">
-      <ToolbarStyled>
-      <IconButton
-  color="inherit"
-  aria-label="menu"
-  onClick={props.toggleSidebar} // Cambiamos el nombre de la función a "toggleSidebar"
->
-  <IconMenu width="20" height="20" />
-</IconButton>
-
-
-        <Box flexGrow={1} />
-        <Stack spacing={1} direction="row" alignItems="center">
-          <Profile />
-        </Stack>
-      </ToolbarStyled>
-    </AppBarStyled>
+    <AppBar position="sticky" color="inherit">
+      <Toolbar className={classes.toolbar}>
+        <IconButton
+          color="inherit"
+          aria-label="menu"
+          onClick={props.toggleSidebar}
+        >
+          <IconMenu width="20" height="20" />
+        </IconButton>
+        <div className={classes.logoContainer}>
+          <Logo />
+        </div>
+        <Profile />
+      </Toolbar>
+    </AppBar>
   );
-};
-
-Header.propTypes = {
-  sx: PropTypes.object,
 };
 
 export default Header;

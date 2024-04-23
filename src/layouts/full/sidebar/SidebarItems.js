@@ -21,7 +21,7 @@ const SidebarItems = () => {
   });
 
   return (
-    <Box sx={{ px: 2 }}>
+    <Box sx={{ px: 4 }}>
       <List sx={{ pt: 0 }} className="sidebarNav">
         {filteredItems.map((item) => {
           if (item.subheader) {

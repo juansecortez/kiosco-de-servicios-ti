@@ -98,16 +98,19 @@ const Form = ({
   };
 
 
-  const handleSendEmails = async (to, cc, title, txt, url) => {
+  const handleSendEmails = async (to, cc, title, txt, urlAceptacion, urlRechazo, solicitante, solicitud) => {
     dispatch({ type: 'ALERT', payload: { loading: true } });
     await postaPI(
-      "mail/sendemail",
+      "mail/sendemail1",
       {
         to,
         cc,
         title,
         txt,
-        url
+        urlAceptacion,
+        urlRechazo,
+        solicitante,
+        solicitud
       }
     )
       .then((res) => {
@@ -168,16 +171,39 @@ const Form = ({
      
     };
 
-    let emailRecipient;
-
+    const emailRecipientsData = [
+      {
+        email: 'galvarez@pcolorada.com',
+        authorizeUrlEnd: 'galvarez',
+        rejectUrlEnd: 'galvarez'
+      },
+      {
+        email: 'ddoval@pcolorada.com',
+        authorizeUrlEnd: 'ddoval',
+        rejectUrlEnd: 'ddoval'
+      },
+      {
+        email: 'jtorres@pcolorada.com',
+        authorizeUrlEnd: 'jtorres',
+        rejectUrlEnd: 'jtorres'
+      },
+      {
+        email: 'atronco@pcolorada.com',
+        authorizeUrlEnd: 'atronco',
+        rejectUrlEnd: 'atronco'
+      }
+    ];
+    
     const tipo = getTipoFromSelectedSubResource(selectedSubResource);
     
+    let selectedRecipients = [];
+    
     if (tipo === 1) {
-        emailRecipient = 'sebastiancorred@gmail.com';
+        selectedRecipients = [emailRecipientsData[2],emailRecipientsData[3]]; // Solo Guillermo
     } else if (tipo === 2) {
-        emailRecipient = 'residente10@pcolorada.com';
+        selectedRecipients = emailRecipientsData; // Todos los destinatarios
     } else {
-        emailRecipient = 'juans.suarez@usantoto.edu.co'; // Esto se usará si no es ni tipo 1 ni tipo 2
+        selectedRecipients = [emailRecipientsData]; // juans.suarez@usantoto.edu.co
     }
     
     try {
@@ -187,17 +213,24 @@ const Form = ({
             payload: { success: res.data.message },
         });
     
-        await handleSendEmails(
-            emailRecipient, // Usa la variable que acabas de determinar
+        for (const recipient of selectedRecipients) {
+          const responseData = res.data.data;
+          await handleSendEmails(
+            recipient.email,
             '',
-            'NUEVA SOLICITUD',
-            'Tienes una nueva solicitud pendiente por aprobar, por favor dirigete al sistema Kiosco TI ingresando al siguiente link :',
-            'http://vwebgama:4002',
-        );
+            `NUEVA SOLICITUD DE`,
+            'Se solicita la autorización para entrega de un recuso informatico con nombre:',
+            `https://autorizaitk.pcolorada.com/api/v1/request/authorize/${responseData}/${recipient.authorizeUrlEnd}`, // URL de Aceptación
+            `https://autorizaitk.pcolorada.com/api/v1/request/reject/${responseData}/${recipient.rejectUrlEnd}`, // URL de Rechazo
+            `${data.applicant}`,
+            `${selectedSubResource}`
+          );
+        }
+    
     } catch (error) {
-      console.log(error);
+        console.log(error);
     }
-
+   
     console.log(data);
     clearFields();
   };
@@ -318,11 +351,13 @@ const Form = ({
                   value={data.type}
                   onChange={handleResourceChange}
                 >
-                  <MenuItem value={1}>Hardware</MenuItem>
-                  <MenuItem value={2}>Software</MenuItem>
+                  <MenuItem value={1}>Software</MenuItem>
+                  <MenuItem value={2}>Hardware</MenuItem>
                   
                 </Select>
                 <FormHelperText>Seleccione el tipo de recurso que necesita.</FormHelperText>
+                <FormHelperText>Tipo 1 : De alto nivel</FormHelperText>
+                <FormHelperText>Tipo 2 : Normal</FormHelperText>
               </FormControl>
             </Stack>
 
@@ -338,7 +373,7 @@ const Form = ({
               sx={{ m: 1 }}
               value={selectedSubResource}
               disabled // Hace que el campo sea de solo lectura.
-              helperText="Seleccione el recurso que necesita."
+              helperText="Seleccione el recurso que necesita (en la ventana emergente)."
             />
             <Stack
               direction="row"

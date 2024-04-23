@@ -46,6 +46,7 @@ const Forms = ({
   fetchLeadership,
 }) => {
   const user = localStorage.getItem('userId');
+  const nombre = localStorage.getItem('nombre');
   const [data, setData] = useState(initialState);
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
@@ -66,14 +67,26 @@ const Forms = ({
   const clearFields = () => {
     setData(initialState);
   };
-  const handleSendEmails = async (to, cc, title, txt, url) => {
+  const handleSendEmails = async (
+    to,
+    cc,
+    title,
+    txt,
+    urlAceptacion,
+    urlRechazo,
+    solicitante,
+    solicitud,
+  ) => {
     dispatch({ type: 'ALERT', payload: { loading: true } });
-    await postaPI('mail/sendemail', {
+    await postaPI('mail/sendemail1', {
       to,
       cc,
       title,
       txt,
-      url,
+      urlAceptacion,
+      urlRechazo,
+      solicitante,
+      solicitud,
     })
       .then((res) => {
         dispatch({ type: 'ALERT', payload: { loading: false } });
@@ -110,8 +123,8 @@ const Forms = ({
       sol_usuarioidSolicitante: user || null,
       altas_nombreColaborador: data.name || null,
       altas_direccion: data.direction || null,
-      altas_gerencia: data.management?.ger_nombre || null,  // Modificado aquí
-      altas_jefatura: data.leadership?.jef_nombre || null, 
+      altas_gerencia: data.management?.ger_nombre || null, // Modificado aquí
+      altas_jefatura: data.leadership?.jef_nombre || null,
       altas_fechaInicio: data.startDate || null,
       altas_fechaFin: data.endDate || null,
       altas_necesitaCorreo: data.needsEmail || null,
@@ -121,22 +134,49 @@ const Forms = ({
     try {
       const res = await postAPI('make/userResgistration', dataToSend);
       console.log('Respuesta del servidor:', res.data.message);
+
       dispatch({
-        // Usa el dispatch para enviar la acción
         type: 'ALERT',
         payload: { success: res.data.message },
       });
 
+      // Obtienes la data del servidor
+      const responseData = res.data.data;
+
+      await handleSendEmails(
+        'ddoval@pcolorada.com',
+        '',
+        `NUEVA SOLICITUD DE`,
+        'Se solicita la autorización para el alta del nuevo usuario con nombre:',
+        `https://autorizaitk.pcolorada.com/api/v1/request/authorize/${responseData}/ddoval`, // URL de Aceptación
+        `https://autorizaitk.pcolorada.com/api/v1/request/reject/${responseData}/ddoval`, // URL de Rechazo
+        `${nombre}`, // Puedes reemplazar esto con la variable que tenga el nombre del solicitante
+        `${data.name}`, // Un ejemplo simple que utiliza responseData. Modifica según tus necesidades
+      );
       await handleSendEmails(
         'galvarez@pcolorada.com',
-        'ddoval@pcolorada.com,jgquiteno@pcolorada.com',
-        'NUEVA SOLICITUD',
-        'Tienes una nueva solicitud  pendiente por aprobar, por favor dirigete al sistema Kiosco TI ingresando al siguiente link:',
-        'http://vwebgama:4002',
+        '',
+        `NUEVA SOLICITUD DE`,
+        'Se solicita la autorizacion para el alta del nuevo usuario con nombre:',
+        `https://autorizaitk.pcolorada.com/api/v1/request/authorize/${responseData}/galvarez`, // URL de Aceptación
+        `https://autorizaitk.pcolorada.com/api/v1/request/reject/${responseData}/galvarez`, // URL de Rechazo
+        `${nombre}`, // Puedes reemplazar esto con la variable que tenga el nombre del solicitante
+        `${data.name}`, // Un ejemplo simple que utiliza responseData. Modifica según tus necesidades
+      );
+      await handleSendEmails(
+        'jvillalobos@pcolorada.com',
+        '',
+        `NUEVA SOLICITUD DE`,
+        'Se solicita la autorizacion para el alta del nuevo usuario con nombre:',
+        `https://autorizaitk.pcolorada.com/api/v1/request/authorize/${responseData}/jvillalobos`, // URL de Aceptación
+        `https://autorizaitk.pcolorada.com/api/v1/request/reject/${responseData}/jvillalobos`, // URL de Rechazo
+        `${nombre}`, // Puedes reemplazar esto con la variable que tenga el nombre del solicitante
+        `${data.name}`, // Un ejemplo simple que utiliza responseData. Modifica según tus necesidades
       );
     } catch (error) {
       console.log('Error en la solicitud:', error.message);
     }
+
     clearFields();
   };
 

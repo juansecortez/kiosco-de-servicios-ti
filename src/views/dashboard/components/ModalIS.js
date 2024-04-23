@@ -75,13 +75,16 @@ function ModalIS({ solicitud, closeModal }) {
                 <p>Tipo de solicitud: {solicitud.tipo_nombreSolicitud}</p>
                 <p>Usuario Solicitante: {solicitud.sol_usuarioidSolicitante}</p>
                 <p>
-                  Estatus de solicitud:{' '}
+                  Estatus de solicitud:
                   {solicitud.sol_estatusSolicitud === null
                     ? 'En proceso'
                     : solicitud.sol_estatusSolicitud === 1
                     ? 'Aceptado'
-                    : 'Rechazado'}
+                    : solicitud.sol_estatusSolicitud === 2
+                    ? 'Rechazado'
+                    : 'Desconocido'}
                 </p>
+
                 <p>
                   Fecha de solicitud:{' '}
                   {solicitud.sol_fechaSolicitud &&
@@ -101,9 +104,9 @@ function ModalIS({ solicitud, closeModal }) {
                       <br />
                       {solicitud.sol_autorizacionNivel === null
                         ? 'Sin autorizar'
-                        : solicitud.sol_autorizacionNivel === 0
-                        ? 'Rechazada'
-                        : 'Autorizada'}
+                        : solicitud.sol_autorizacionNivel 
+                        ? 'Autorizada'
+                        : 'Rechazada'}
                       <br />
                       {solicitud.sol_fechaAutorizacionNivel &&
                         new Date(solicitud.sol_fechaAutorizacionNivel).toISOString().split('T')[0]}
@@ -116,9 +119,9 @@ function ModalIS({ solicitud, closeModal }) {
                       <br />
                       {solicitud.sol_autorizacionJefeInfra === null
                         ? 'Sin autorizar'
-                        : solicitud.sol_autorizacionJefeInfra === 0
-                        ? 'Rechazada'
-                        : 'Autorizada'}
+                        : solicitud.sol_autorizacionJefeInfra 
+                        ? 'Autorizada'
+                        : 'Rechazada'}
                       <br />
                       {solicitud.sol_fechaAutorizacionJefeInfra &&
                         new Date(solicitud.sol_fechaAutorizacionJefeInfra)
@@ -133,9 +136,9 @@ function ModalIS({ solicitud, closeModal }) {
                       <br />
                       {solicitud.sol_autorizacionJefeDesarrollo === null
                         ? 'Sin autorizar'
-                        : solicitud.sol_autorizacionJefeDesarrollo === 0
-                        ? 'Rechazada'
-                        : 'Autorizada'}
+                        : solicitud.sol_autorizacionJefeDesarrollo 
+                        ? 'Autorizada'
+                        : 'Rechazada'}
                       <br />
                       {solicitud.sol_fechaAutorizacionJefeDesarrollo &&
                         new Date(solicitud.sol_fechaAutorizacionJefeDesarrollo)
@@ -150,9 +153,9 @@ function ModalIS({ solicitud, closeModal }) {
                       <br />
                       {solicitud.sol_autorizacionJefeSeguridad === null
                         ? 'Sin autorizar'
-                        : solicitud.sol_autorizacionJefeSeguridad === 0
-                        ? 'Rechazada'
-                        : 'Autorizada'}
+                        : solicitud.sol_autorizacionJefeSeguridad
+                        ? 'Autorizada'
+                        : 'Rechazada'}
                       <br />
                       {solicitud.sol_fechaAutorizacionJefeSeguridad &&
                         new Date(solicitud.sol_fechaAutorizacionJefeSeguridad)
@@ -160,6 +163,7 @@ function ModalIS({ solicitud, closeModal }) {
                           .split('T')[0]}
                     </p>
                   )}
+                  {solicitud.sol_gerenciaTI && console.log(solicitud.sol_autorizacionGerenciaTI)}
                   {solicitud.sol_gerenciaTI && (
                     <p>
                       <strong>{solicitud.sol_gerenciaTINombre} </strong>
@@ -167,9 +171,9 @@ function ModalIS({ solicitud, closeModal }) {
                       <br />
                       {solicitud.sol_autorizacionGerenciaTI === null
                         ? 'Sin autorizar'
-                        : solicitud.sol_autorizacionGerenciaTI === 0
-                        ? 'Rechazada'
-                        : 'Autorizada'}
+                        : solicitud.sol_autorizacionGerenciaTI
+                        ? 'Autorizada'
+                        : 'Rechazada'}
                       <br />
                       {solicitud.sol_fechaAutorizacionGerenciaTI &&
                         new Date(solicitud.sol_fechaAutorizacionGerenciaTI)
@@ -184,9 +188,9 @@ function ModalIS({ solicitud, closeModal }) {
                       <br />
                       {solicitud.sol_autorizacionDirFinanzas === null
                         ? 'Sin autorizar'
-                        : solicitud.sol_autorizacionDirFinanzas === 0
-                        ? 'Rechazada'
-                        : 'Autorizada'}
+                        : solicitud.sol_autorizacionDirFinanzas
+                        ? 'Autorizada'
+                        : 'Rechazada'}
                       <br />
                       {solicitud.sol_fechaAutorizacionDirFinanzas &&
                         new Date(solicitud.sol_fechaAutorizacionDirFinanzas)
@@ -194,6 +198,9 @@ function ModalIS({ solicitud, closeModal }) {
                           .split('T')[0]}
                     </p>
                   )}
+                  {solicitud.sol_direccionGeneral &&
+                    console.log(solicitud.sol_autorizacionDirGeneral)}
+
                   {solicitud.sol_direccionGeneral && (
                     <p>
                       <strong>{solicitud.sol_dirGeneralNombre} </strong>
@@ -201,9 +208,9 @@ function ModalIS({ solicitud, closeModal }) {
                       <br />
                       {solicitud.sol_autorizacionDirGeneral === null
                         ? 'Sin autorizar'
-                        : solicitud.sol_autorizacionDirGeneral === 0
-                        ? 'Rechazada'
-                        : 'Autorizada'}
+                        : solicitud.sol_autorizacionDirGeneral
+                        ? 'Autorizada'
+                        : 'Rechazada'}
                       <br />
                       {solicitud.sol_fechaAutorizacionDirGeneral &&
                         new Date(solicitud.sol_fechaAutorizacionDirGeneral)
