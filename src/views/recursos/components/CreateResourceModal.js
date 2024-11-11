@@ -80,10 +80,10 @@ const CreateResourceModal = ({ open, onClose, onCreate }) => {
           <InputLabel>Nivel</InputLabel>
           <Select value={nivel} onChange={(e) => setNivel(e.target.value)}>
             <MenuItem value={'1'}>1</MenuItem>
-            <MenuItem value={'2'}>2</MenuItem>
+          
           </Select>
-          <FormHelperText>Tipo 1 : De alto nivel</FormHelperText>
-          <FormHelperText>Tipo 2 : Normal</FormHelperText>
+          <FormHelperText>Tipo 1 : Único Nivel</FormHelperText>
+        
         </FormControl>
         <FormControl fullWidth margin="normal">
           <InputLabel>Jerarquia</InputLabel>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import Autocomplete from '@mui/material/Autocomplete';
-
 import {
   Button,
   TextField,
@@ -34,19 +33,21 @@ const FormularioSolicitud = ({
   fetchLeadership,
   zonas,
   fetchZonas,
-
   issues,
 }) => {
   const dispatch = useDispatch();
-  const [data, setData] = React.useState(initialState);
+  const [data, setData] = useState(initialState);
   const ID_Usuario = localStorage.getItem('userId');
-  const Jerarquia = localStorage.getItem('tipo'); // Asegúrate de que este valor esté correctamente almacenado en localStorage
+  const Jerarquia = localStorage.getItem('tipo');
   const [Descripcion, setDescripcion] = useState('');
   const [Tipo, setTipo] = useState('');
   const [Ubicacion, setUbicacion] = useState('');
   const [ubicacionesByZona, setUbicacionesByZona] = useState([]);
   const [SelectedIssue, setSelectedIssue] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  
+  const [error, setError] = useState(''); // Estado para mensajes de error
+  const [successMessage, setSuccessMessage] = useState(''); // Estado para mensaje de éxito
 
   useEffect(() => {
     fetchLeadership();
@@ -55,21 +56,37 @@ const FormularioSolicitud = ({
 
   useEffect(() => {
     if (Tipo) {
-      dispatch(fetchIssuesByType(Tipo));
+      dispatch(fetchIssuesByType(Tipo)).then((updatedIssues = []) => {
+        const isSelectedIssueValid = updatedIssues.some(
+          (issue) => issue.nombreConTipo === SelectedIssue?.nombreConTipo
+        );
+        if (!isSelectedIssueValid) {
+          setSelectedIssue(null);
+        }
+      });
     }
   }, [Tipo]);
 
   const clearFields = () => {
     setData(initialState);
-    setDescripcion(''); // Limpia el campo Descripcion
-    setTipo(''); // Limpia el campo Tipo
-    setUbicacion(''); // Limpia el campo Ubicacion
-    setUbicacionesByZona([]); // Limpia las ubicaciones asociadas a una zona
-    setSelectedIssue(null); // Limpia el campo Issue
-    setSelectedFile(null); // Limpia el input de imagen
+    setDescripcion('');
+    setTipo('');
+    setUbicacion('');
+    setUbicacionesByZona([]);
+    setSelectedIssue(null);
+    setSelectedFile(null);
   };
 
-  const tipos = ['Incidente', 'Requerimiento'];
+  // Validación de campos
+  const validateForm = () => {
+    if (!Tipo || !SelectedIssue || !Descripcion || !data.leadership || !Ubicacion) {
+      setError('Por favor, completa todos los campos requeridos.');
+      return false;
+    }
+    setError('');
+    return true;
+  };
+
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
   };
@@ -77,30 +94,35 @@ const FormularioSolicitud = ({
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (!validateForm()) return; // Si la validación falla, no continúa
+
     const formData = new FormData();
     formData.append('ID_Usuario', ID_Usuario);
-    formData.append('Tipo', Tipo);formData.append('Jefatura', data.leadership ? data.leadership.jef_nombre : null);
-
+    formData.append('Tipo', Tipo);
+    formData.append('Jefatura', data.leadership ? data.leadership.jef_nombre : null);
     formData.append('Ubicacion', Ubicacion);
- 
-
     formData.append('Jerarquia', Jerarquia);
     formData.append('Descripcion', Descripcion);
 
-    // Espera a que la solicitud se haya creado
-    const response = await dispatch(crearSolicitud('solicitud/crearSolicitud', formData));
-    const updatedID_Servicio = response.ID_Servicio;
+    try {
+      const response = await dispatch(crearSolicitud('solicitud/crearSolicitud', formData));
+      const updatedID_Servicio = response.ID_Servicio;
+      formData.append('ID_Servicio', updatedID_Servicio);
 
-    formData.append('ID_Servicio', updatedID_Servicio);
+      if (selectedFile) {
+        formData.append('imagen', selectedFile);
+        await dispatch(
+          agregarImagen('solicitud/subirImagen', selectedFile, updatedID_Servicio, null, null),
+        );
+      }
 
-    if (selectedFile) {
-      formData.append('imagen', selectedFile);
-      await dispatch(
-        agregarImagen('solicitud/subirImagen', selectedFile, updatedID_Servicio, null, null),
-      );
+      clearFields();
+      setSuccessMessage('Solicitud creada con éxito'); // Mensaje de éxito
+
+    } catch (error) {
+      setError('Ocurrió un error al enviar la solicitud. Intenta nuevamente.');
+      console.error('Error:', error);
     }
-
-    clearFields();
   };
 
   return (
@@ -108,6 +130,10 @@ const FormularioSolicitud = ({
       <Grid sx={{ display: 'flex', flexWrap: 'wrap', p: 2 }}>
         <form onSubmit={handleSubmit}>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+            {error && <FormHelperText error>{error}</FormHelperText>}
+            {successMessage && (
+              <FormHelperText sx={{ color: 'green' }}>{successMessage}</FormHelperText>
+            )}
             <Stack direction="row" sx={{ gap: 2, width: '100%' }}>
               <FormControl fullWidth>
                 <InputLabel id="select-label-tipo">Tipo</InputLabel>
@@ -116,54 +142,45 @@ const FormularioSolicitud = ({
                   value={Tipo}
                   onChange={(e) => setTipo(e.target.value)}
                 >
-                  {tipos.map((tipo) => (
+                  {['Incidente', 'Requerimiento'].map((tipo) => (
                     <MenuItem key={tipo} value={tipo}>
                       {tipo}
                     </MenuItem>
                   ))}
                 </Select>
                 <FormHelperText>
-                  Seleccione el tipo de reporte para el que solicita el servicio técnico. <br></br>{' '}
-                  Incidentes = Fallas <br></br>Requerimientos = Necesidades.
+                  Seleccione el tipo de reporte para el que solicita el servicio técnico.
+                  <br />
+                  Incidentes = Fallas <br />
+                  Requerimientos = Necesidades.
                 </FormHelperText>
-                <br></br>
               </FormControl>
 
               <FormControl fullWidth>
-                <InputLabel id="select-label-issue"></InputLabel>
-
                 <Autocomplete
                   id="combo-box-issue"
                   options={issues}
                   getOptionLabel={(option) => option.nombreConTipo || ' '}
                   value={SelectedIssue}
-                  onChange={(event, newValue) => {
-                    setData((prevData) => ({
-                      ...prevData,
-                      leadership: newValue, // aquí almacenamos todo el objeto
-                    }));
-                  }}
+                  onChange={(event, newValue) => setSelectedIssue(newValue)}
                   renderInput={(params) => <TextField {...params} label="Issue" />}
                 />
               </FormControl>
             </Stack>
 
-            <Stack
-              direction="row"
-              sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
-            >
+            <Stack direction="row" sx={{ width: '100%' }}>
               <FormControl fullWidth>
                 <Autocomplete
                   id="autocomplete-leadership"
                   options={leadership}
                   getOptionLabel={(option) => option.jef_nombre || ''}
                   value={data.leadership}
-                  onChange={(event, newValue) => {
+                  onChange={(event, newValue) =>
                     setData((prevData) => ({
                       ...prevData,
                       leadership: newValue || null,
-                    }));
-                  }}
+                    }))
+                  }
                   renderInput={(params) => (
                     <TextField {...params} label="Jefatura" placeholder="Escribe para buscar..." />
                   )}
@@ -172,26 +189,20 @@ const FormularioSolicitud = ({
               </FormControl>
             </Stack>
 
-            <Stack
-              direction="row"
-              sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
-            >
+            <Stack direction="row" sx={{ width: '100%' }}>
               <FormControl fullWidth>
                 <Autocomplete
                   id="combo-box-zona"
                   options={zonas}
                   getOptionLabel={(option) => option.Nombre || ''}
-                  value={data.zona} // Usar el objeto completo como valor
+                  value={data.zona}
                   onChange={(event, newValue) => {
                     setData((prevData) => ({
                       ...prevData,
-                      zona: newValue || null, // Guardar el objeto completo
+                      zona: newValue || null,
                     }));
-
-                    // Lógica para cargar las ubicaciones relacionadas con la Zona seleccionada
                     if (newValue) {
                       dispatch(fetchUbicacionesByZona(newValue.Nombre)).then((ubicaciones) => {
-                        console.log('Ubicaciones obtenidas:', ubicaciones);
                         setUbicacionesByZona(ubicaciones);
                       });
                     }
@@ -205,10 +216,8 @@ const FormularioSolicitud = ({
                 </FormHelperText>
               </FormControl>
             </Stack>
-            <Stack
-              direction="row"
-              sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
-            >
+
+            <Stack direction="row" sx={{ width: '100%' }}>
               <FormControl fullWidth>
                 <InputLabel id="select-label-ubicacion">Ubicación</InputLabel>
                 <Select
@@ -218,38 +227,33 @@ const FormularioSolicitud = ({
                   value={Ubicacion}
                   onChange={(e) => setUbicacion(e.target.value)}
                 >
-                  {ubicacionesByZona &&
-                    ubicacionesByZona.map((ubicacion) => (
-                      <MenuItem key={ubicacion.ID} value={ubicacion.UbicacionConZona}>
-                        {ubicacion.UbicacionConZona}
-                      </MenuItem>
-                    ))}
+                  {ubicacionesByZona?.map((ubicacion) => (
+                    <MenuItem key={ubicacion.ID} value={ubicacion.UbicacionConZona}>
+                      {ubicacion.UbicacionConZona}
+                    </MenuItem>
+                  ))}
                 </Select>
                 <FormHelperText>
                   Seleccione la ubicación específica donde se encuentra la solicitud.
                 </FormHelperText>
-                <br></br>
               </FormControl>
             </Stack>
-            <Stack direction="row" sx={{ gap: 2, width: '100%' }}>
+
+            <Stack direction="row" sx={{ width: '100%' }}>
               <TextField
                 label="Descripción"
                 value={Descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
                 multiline
-                rows={6} // Aumenta la altura inicial del TextField
-                helperText="Explique detalladamente todo lo relacionado a su solicitúd, más información facilita la pronta resolución de su caso."
+                rows={6}
+                helperText="Explique detalladamente todo lo relacionado a su solicitud."
                 fullWidth
               />
             </Stack>
-            <Stack
-              direction="row"
-              sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
-            >
+
+            <Stack direction="row" sx={{ width: '100%' }}>
               <FormControl fullWidth>
-                <br></br>
-                <input type="file" onChange={(e) => handleFileChange(e)} />
-                <br></br>
+                <input type="file" onChange={handleFileChange} />
                 <FormHelperText>
                   Seleccione una imagen para adjuntar a su solicitud (solo si es necesario).
                 </FormHelperText>
@@ -280,10 +284,11 @@ const FormularioSolicitud = ({
     </DashboardCard>
   );
 };
+
 const mapStateToProps = (state) => ({
   leadership: state.selects.leadership,
   zonas: state.zonasUbicacionReducer.zonas,
-  issues: state.issueReducer.issues, // Agregamos esta línea
+  issues: state.issueReducer.issues,
 });
 
 const mapDispatchToProps = (dispatch) => ({

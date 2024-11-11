@@ -183,12 +183,12 @@ const Form = ({
         rejectUrlEnd: 'ddoval'
       },
       {
-        email: 'jtorres@pcolorada.com',
+        email: 'se.desarrolladormina@pcolorada.com',
         authorizeUrlEnd: 'jtorres',
         rejectUrlEnd: 'jtorres'
       },
       {
-        email: 'atronco@pcolorada.com',
+        email: 'se.desarrolladormina@pcolorada.com',
         authorizeUrlEnd: 'atronco',
         rejectUrlEnd: 'atronco'
       }
@@ -201,7 +201,7 @@ const Form = ({
     if (tipo === 1) {
         selectedRecipients = [emailRecipientsData[2],emailRecipientsData[3]]; // Solo Guillermo
     } else if (tipo === 2) {
-        selectedRecipients = emailRecipientsData; // Todos los destinatarios
+        selectedRecipients = [emailRecipientsData[2],emailRecipientsData[3]]; // Todos los destinatarios
     } else {
         selectedRecipients = [emailRecipientsData]; // juans.suarez@usantoto.edu.co
     }
@@ -356,8 +356,7 @@ const Form = ({
                   
                 </Select>
                 <FormHelperText>Seleccione el tipo de recurso que necesita.</FormHelperText>
-                <FormHelperText>Tipo 1 : De alto nivel</FormHelperText>
-                <FormHelperText>Tipo 2 : Normal</FormHelperText>
+             
               </FormControl>
             </Stack>
 
@@ -379,15 +378,16 @@ const Form = ({
               direction="row"
               sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
             >
-              <TextField
-                fullWidth
-                label="Cantidad"
-                id="quantity"
-                sx={{ m: 1 }}
-                value={data.quantity || ''}
-                onChange={handleChangeInput('quantity')}
-                helperText="ingrese en números la cantidad de recursos que necesita."
-              />
+            <TextField
+  fullWidth
+  label="Cantidad"
+  id="quantity"
+  sx={{ m: 1 }}
+  value={1} // Valor fijo de 1
+  disabled // Campo deshabilitado, no se puede editar
+  helperText="Si necesita una cantidad mayor a la asignada debe hacer otra solicitud."
+/>
+
               <TextField
                 fullWidth
                 label="Descripción"
